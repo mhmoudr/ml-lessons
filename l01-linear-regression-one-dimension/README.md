@@ -1,0 +1,2 @@
+![first page](https://github.com/mhmoudr/ml-lessons/raw/master/l01-linear-regression-one-dimension/01.jpg)
+![second page](https://github.com/mhmoudr/ml-lessons/raw/master/l01-linear-regression-one-dimension/02.jpg)
