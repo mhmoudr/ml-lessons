@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 namespace l01_linear_regression_one_dimension
 {
     class Program
@@ -40,24 +41,38 @@ namespace l01_linear_regression_one_dimension
         {
             var model = new Model() { a = 1, b = 1 };
             var iteration = 0;
-            var stepSize = 0.01d;
-            while (iteration < maxNumerOfIterations)
+            //var stepSize = 0.01d;
+            var oldError = double.MaxValue;
+            var error = MSE.calc(model, data);
+            var threshold = 0.0001;
+            while (iteration < maxNumerOfIterations && oldError - error > threshold || error > oldError)
             {
                 var Ga = 0d;
                 var Gb = 0d;
                 for (int i = 0; i < data.size; i++)
                 {
-                    Ga += -2 * data.x[i] * (data.y[i] - (model.a * data.x[i] + model.b));
-                    Gb += -2 * (data.y[i] - (model.a * data.x[i] + model.b));
+                    Ga += -2 * data.x[i] * (data.y[i] - model.predict(data.x[i]));
+                    Gb += -2 * (data.y[i] - model.predict(data.x[i]));
                 }
                 Ga /= data.size;
                 Gb /= data.size;
-                Console.WriteLine($"{iteration}:\ta={model.a}\tb={model.b}\tGa={Ga}\tGb={Gb}");
+                var stepSize = 1d / (2 + iteration);
+                Console.WriteLine($"{iteration}:\ta={model.a}\tb={model.b}\tGa={Ga}\tGb={Gb}\tE={error}\tStep={stepSize}");
                 model.a -= Ga * stepSize;
                 model.b -= Gb * stepSize;
+
+                oldError = error;
+                error = MSE.calc(model, data);
                 iteration++;
             }
             return model;
+        }
+    }
+    class MSE
+    {
+        public static double calc(Model model, Data data)
+        {
+            return data.y.Zip(data.x, (y, x) => Math.Pow(y - model.predict(x), 2)).Sum();
         }
     }
 }
