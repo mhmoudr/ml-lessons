@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace id3
 {
-    internal class Data
+    public class Data
     {
         public readonly Dictionary<string, int> Columns;
         public readonly List<string[]> Rows;

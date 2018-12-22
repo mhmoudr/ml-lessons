@@ -2,7 +2,7 @@ using System.Data;
 
 namespace id3
 {
-    internal static class Repository
+    public static class Repository
     {
         public static Data GetTrainStatusData()
         {
