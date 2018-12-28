@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
+using System.Net.NetworkInformation;
 
 namespace id3
 {
-    public class Entropy
+    public static class Entropy
     {
         public static double Calculate(Data data, string targetColumn)
         {
