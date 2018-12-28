@@ -24,7 +24,7 @@ namespace id3
             res.Rows.Add(new [] {"9", "Sunny", "Normal", "Weak", "false"});
             res.Rows.Add(new [] {"10", "Rain", "Normal", "Weak", "false"});
             res.Rows.Add(new [] {"11", "Sunny", "Normal", "Strong", "false"});
-            res.Rows.Add(new [] {"12", "Overcast", "High", "String", "false"});
+            res.Rows.Add(new [] {"12", "Overcast", "High", "Strong", "false"});
             res.Rows.Add(new [] {"13", "Overcast", "Normal", "Weak", "false"});
             res.Rows.Add(new [] {"14", "Rain", "High", "Strong", "true"});
             return res;
