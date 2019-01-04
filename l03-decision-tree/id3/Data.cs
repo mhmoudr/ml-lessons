@@ -10,7 +10,12 @@ namespace id3
         public Data()
         {
             Columns = new Dictionary<string, int>();
-            Rows=new List<string[]>();
+            Rows = new List<string[]>();
+        }
+        public Data(Dictionary<string, int> columns, List<string[]> rows)
+        {
+            Columns = columns;
+            Rows = rows;
         }
     }
 }
