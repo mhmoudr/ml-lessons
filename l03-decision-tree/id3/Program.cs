@@ -9,8 +9,9 @@ namespace id3
         static void Main(string[] args)
         {
             var data = Repository.GetTrainStatusData();
-            var features = data.Columns.Keys.Where(c => c != "IsLate" && c != "Day").ToArray();
-            var node = Id3.Train(data, "IsLate", features);
+            var label = "IsLate";
+            var features = data.Columns.Keys.Where(c => c != label && c != "Day").ToArray();
+            var node = Id3.Train(data, label, features);
             node.print();
         }
     }
