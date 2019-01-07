@@ -17,23 +17,26 @@ namespace id3
             Console.WriteLine("==============");
             print(0, this);
         }
+        public String Prediction = null;
+        public bool IsLeaf { get { return Prediction != null; } }
         bool HaveSplit { get { return (Children != null); } }
         void print(int level, Node node)
         {
             printSpace(level);
-            if (node.HaveSplit)
+            if (!node.IsLeaf)
             {
                 Console.WriteLine($"Node level {level} split by {node.SplittingColumn.col} ({node.SplittingColumn.gain}) for the following values:");
                 level++;
                 foreach (var n in node.Children)
                 {
+                    printSpace(level);
                     Console.WriteLine($"value {n.Key}:");
                     print(level + 1, n.Value);
                 }
             }
             else
             {
-                Console.WriteLine($"leaf node with value (not implemented)");
+                Console.WriteLine($"leaf node with value {node.Prediction}");
             }
         }
         void printSpace(int level)

@@ -14,7 +14,23 @@ namespace id3
         {
             var colWithMaxGain = FindBestSplit(node, labelColumn, features);
             node.SplittingColumn = colWithMaxGain;
-            node.Children = GenerateChildrenNodes(node);
+            var possibleLeaf = IsItLeaf(node, labelColumn);
+            if (possibleLeaf != null)
+                node.Prediction = possibleLeaf;
+            else
+            {
+                node.Children = GenerateChildrenNodes(node);
+                foreach (var n in node.Children)
+                    Train(n.Value, labelColumn, features);
+            }
+        }
+        private static string IsItLeaf(Node node, string labelColumn)
+        {
+            var lblIdx = node.Data.Columns[labelColumn];
+            var labels = node.Data.Rows.Select(r => r[lblIdx]);
+            var first = labels.First();
+            return (labels.All(l => l == first)) ? first : null;
+
         }
         private static (string col, double gain) FindBestSplit(Node node, string labelColumn, string[] features)
         {
