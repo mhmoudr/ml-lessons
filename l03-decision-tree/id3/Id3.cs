@@ -2,35 +2,43 @@ using System.Collections.Generic;
 using System.Linq;
 namespace id3
 {
-    public class Id3
+    public static class Id3
     {
-        public static Node Train(Data data, string labelColumn, string[] features)
+        public static Node Train(Data data, string labelColumn, string[] features, int maxDepth = 10)
         {
             var node = new Node(data);
-            Train(node, labelColumn, features);
+            Train(node, labelColumn, features, 0, maxDepth);
             return node;
         }
-        private static void Train(Node node, string labelColumn, string[] features)
+        private static void Train(Node node, string labelColumn, string[] features, int currentLevel, int maxDepth)
         {
             var colWithMaxGain = FindBestSplit(node, labelColumn, features);
             node.SplittingColumn = colWithMaxGain;
-            var possibleLeaf = IsItLeaf(node, labelColumn);
+            var possibleLeaf = IsItLeaf(node, labelColumn, currentLevel, maxDepth);
             if (possibleLeaf != null)
                 node.Prediction = possibleLeaf;
             else
             {
                 node.Children = GenerateChildrenNodes(node);
                 foreach (var n in node.Children)
-                    Train(n.Value, labelColumn, features);
+                    Train(n.Value, labelColumn, features, currentLevel + 1, maxDepth);
             }
         }
-        private static string IsItLeaf(Node node, string labelColumn)
+        private static string IsItLeaf(Node node, string labelColumn, int currentLevel, int maxDepth)
         {
             var lblIdx = node.Data.Columns[labelColumn];
             var labels = node.Data.Rows.Select(r => r[lblIdx]);
-            var first = labels.First();
-            return (labels.All(l => l == first)) ? first : null;
-
+            string leafValue = null;
+            if (currentLevel >= maxDepth)
+            {
+                leafValue = labels.GroupBy(l => l).OrderByDescending(g => g.Count()).First().Key;
+            }
+            else
+            {
+                var first = labels.First();
+                leafValue = (labels.All(l => l == first)) ? first : null;
+            }
+            return leafValue;
         }
         private static (string col, double gain) FindBestSplit(Node node, string labelColumn, string[] features)
         {
