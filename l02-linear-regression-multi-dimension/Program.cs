@@ -1,0 +1,117 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace l01_linear_regression_multi_dimension
+{
+    class Program
+    {
+
+        static void Main(string[] args)
+        {
+            // the following code is just to generate some sample data with known betas then try to model this data.
+            //var m = new Model { b = new[] { 3d, 4, -7, 11 } };
+            //Action<double[]> f = (double[] x) => { 
+            //    Console.WriteLine($"({m.Predict(x)}d, new[]{{{string.Join("d,",x)}}}),"); 
+            //};
+            //f(new[] { 1d, 1, 1 });
+            //f(new[] { 1d, 2, 3 });
+            //f(new[] { 4d, 1, 1 });
+            //f(new[] { 5d, -3, 0 });
+            //f(new[] { 7d, 1, 11 });
+            //f(new[] { 2d, 11, 1 });
+            //f(new[] { 13d, 6, 5 });
+            //f(new[] { 8d, 1, 1 });
+            //f(new[] { 6d, 13, 7 });
+            //f(new[] { 0d, -6, 0 });
+            //f(new[] { 3d, 3, 1 });
+
+
+            var data = new Data(new[] {
+                (11d, new[]{1d,1d,1}),
+                (1d, new[]{1d,2d,3}),
+                (20d, new[]{4d,1d,1}),
+                (14d, new[]{5d,-3d,0}),
+                (-41d, new[]{7d,1d,11}),
+                (54d, new[]{2d,11d,1}),
+                (39d, new[]{13d,6d,5}),
+                (32d, new[]{8d,1d,1}),
+                (32d, new[]{6d,13d,7}),
+                (-13d, new[]{0d,-6d,0}),
+                (25d, new[]{3d,3d,1})
+            });
+            var model = LinearRegression.Train(data, 10000);
+
+            Console.WriteLine($"{model.Predict(new[] { 1.0, 2, 3 })}");
+        }
+    }
+
+    class Model
+    {
+        public double[] b;
+        public double Predict(double[] x) => x.Zip(b, (f, s) => f * s).Sum() + b[x.Length];
+    }
+
+    public class Data
+    {
+        public readonly (double, double[])[] Rows;
+
+        public Data((double, double[])[] rows)
+        {
+            Rows = rows;
+        }
+    }
+
+    class LinearRegression
+    {
+        public static Model Train(Data data, int maxNumerOfIterations)
+        {
+            var model = new Model { b = Enumerable.Repeat(10d, data.Rows[0].Item2.Length + 1).ToArray() };
+            var iteration = 0;
+            var stepSize = 0.01d;
+            var oldError = double.MaxValue;
+            var error = MSE.Calc(model, data);
+            var threshold = 0.0001;
+            while (iteration < maxNumerOfIterations && oldError - error > threshold || error > oldError)
+            {
+                var gradients = MSE.Gradients(model, data);
+                //var stepSize = 1d / (2 + iteration);
+                for (int i = 0; i < model.b.Length; i++)
+                    model.b[i] -= gradients[i] * stepSize;
+                Console.WriteLine($"iteration {iteration}, error {error}");
+                Console.WriteLine($"\t Mode: [ {String.Join("| \t", model.b.Select(b => b.ToString()))} ]");
+                Console.WriteLine($"\t Gradients: [ {String.Join(", ", gradients.Select(b => b.ToString()))} ]");
+                oldError = error;
+                error = MSE.Calc(model, data);
+                iteration++;
+            }
+            return model;
+        }
+    }
+
+    class MSE
+    {
+        public static double Calc(Model model, Data data)
+        {
+            return data.Rows.Select(i => Math.Pow(i.Item1 - model.Predict(i.Item2), 2)).Sum();
+        }
+
+        private static double GradientBeta_0(Model model, Data data)
+        {
+            return data.Rows.Select(i => i.Item1 - model.Predict(i.Item2)).Sum() * (-2) / data.Rows.Length;
+        }
+
+        private static double GradientBeta_k(Model model, Data data, int k)
+        {
+            return data.Rows.Select(i => (i.Item1 - model.Predict(i.Item2)) * i.Item2[k]).Sum() * (-2) / data.Rows.Length;
+        }
+
+        public static double[] Gradients(Model model, Data data)
+        {
+            var numberOfFactors = data.Rows[0].Item2.Length;
+            return Enumerable.Range(0, numberOfFactors)
+                    .Select(k => GradientBeta_k(model, data, k))
+                    .Concat(new[] { GradientBeta_0(model, data) }).ToArray();
+        }
+    }
+}
