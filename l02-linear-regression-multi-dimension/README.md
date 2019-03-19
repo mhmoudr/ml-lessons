@@ -1,0 +1,1 @@
+![first page](https://github.com/mhmoudr/ml-lessons/raw/master/l02-linear-regression-multi-dimension/01.png)
