@@ -27,7 +27,9 @@ namespace l01_linear_regression_multi_dimension
             //f(new[] { 3d, 3, 1 });
 
 
-            var data = new Data(new[] {
+            var data = new Data()
+            {
+                Rows = new[] {
                 (11d, new[]{1d,1d,1}),
                 (1d, new[]{1d,2d,3}),
                 (20d, new[]{4d,1d,1}),
@@ -39,7 +41,8 @@ namespace l01_linear_regression_multi_dimension
                 (32d, new[]{6d,13d,7}),
                 (-13d, new[]{0d,-6d,0}),
                 (25d, new[]{3d,3d,1})
-            });
+            }
+            };
             var model = LinearRegression.Train(data, 10000);
 
             Console.WriteLine($"{model.Predict(new[] { 1.0, 2, 3 })}");
@@ -49,24 +52,20 @@ namespace l01_linear_regression_multi_dimension
     class Model
     {
         public double[] b;
-        public double Predict(double[] x) => x.Zip(b, (f, s) => f * s).Sum() + b[x.Length];
+        public double Predict(double[] x) => x.Zip(b, (xx, bb) => xx * bb).Sum() + b[x.Length];
     }
 
     public class Data
     {
-        public readonly (double, double[])[] Rows;
-
-        public Data((double, double[])[] rows)
-        {
-            Rows = rows;
-        }
+        public (double y, double[] x)[] Rows;
+        public int NumberOfFeatures { get { return Rows[0].x.Length; } }
     }
 
     class LinearRegression
     {
         public static Model Train(Data data, int maxNumerOfIterations)
         {
-            var model = new Model { b = Enumerable.Repeat(10d, data.Rows[0].Item2.Length + 1).ToArray() };
+            var model = new Model { b = Enumerable.Repeat(10d, data.NumberOfFeatures + 1).ToArray() };
             var iteration = 0;
             var stepSize = 0.01d;
             var oldError = double.MaxValue;
@@ -93,23 +92,22 @@ namespace l01_linear_regression_multi_dimension
     {
         public static double Calc(Model model, Data data)
         {
-            return data.Rows.Select(i => Math.Pow(i.Item1 - model.Predict(i.Item2), 2)).Sum();
+            return data.Rows.Select(i => Math.Pow(i.y - model.Predict(i.x), 2)).Sum() / data.Rows.Length;
         }
 
         private static double GradientBeta_0(Model model, Data data)
         {
-            return data.Rows.Select(i => i.Item1 - model.Predict(i.Item2)).Sum() * (-2) / data.Rows.Length;
+            return data.Rows.Select(i => i.y - model.Predict(i.x)).Sum() * (-2) / data.Rows.Length;
         }
 
         private static double GradientBeta_k(Model model, Data data, int k)
         {
-            return data.Rows.Select(i => (i.Item1 - model.Predict(i.Item2)) * i.Item2[k]).Sum() * (-2) / data.Rows.Length;
+            return data.Rows.Select(i => (i.y - model.Predict(i.x)) * i.x[k]).Sum() * (-2) / data.Rows.Length;
         }
 
         public static double[] Gradients(Model model, Data data)
         {
-            var numberOfFactors = data.Rows[0].Item2.Length;
-            return Enumerable.Range(0, numberOfFactors)
+            return Enumerable.Range(0, data.NumberOfFeatures)
                     .Select(k => GradientBeta_k(model, data, k))
                     .Concat(new[] { GradientBeta_0(model, data) }).ToArray();
         }
