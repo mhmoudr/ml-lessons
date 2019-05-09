@@ -6,9 +6,16 @@ namespace l01_linear_regression_one_dimension
     {
         static void Main(string[] args)
         {
-            var data = new Data(
-                new double[] { 1, 2, 3, 4, 5 },
-                new double[] { 0.8, 1, 2, 2.2, 2.3 });
+            var data = new Data()
+            {
+                rows = new (double, double)[]{
+                (0.8,1),
+                (1,2),
+                (2,3),
+                (2.2,4),
+                (2.3,5)
+            }
+            };
             var model = LinearRegression.train(data, 1000);
 
             Console.WriteLine($"priave for 6 bed rooms is {model.predict(6)}");
@@ -22,18 +29,8 @@ namespace l01_linear_regression_one_dimension
     }
     class Data
     {
-        public readonly double[] x;
-        public readonly double[] y;
-        public readonly int size;
-        public int N { get { return size; } }
-        public Data(double[] px, double[] py)
-        {
-            if (px.Length != py.Length)
-                throw new Exception("Invalid data");
-            x = px;
-            y = py;
-            size = px.Length;
-        }
+        public (double y, double x)[] rows;
+        public int N { get { return rows.Length; } }
     }
     class LinearRegression
     {
@@ -48,8 +45,8 @@ namespace l01_linear_regression_one_dimension
             while (iteration < maxNumerOfIterations && oldError - error > threshold || error > oldError)
             {
 
-                var Ga = data.y.Zip(data.x, (y, x) => -2 * x * (y - model.predict(x))).Sum() / data.size;
-                var Gb = data.y.Zip(data.x, (y, x) => -2 * (y - model.predict(x))).Sum() / data.size;
+                var Ga = MSE.GradientA(model,data);
+                var Gb = MSE.GradientB(model,data);
                 var stepSize = 1d / (2 + iteration);
                 Console.WriteLine($"{iteration}:\ta={model.a}\tb={model.b}\tGa={Ga}\tGb={Gb}\tE={error}\tStep={stepSize}");
                 model.a -= Ga * stepSize;
@@ -65,7 +62,15 @@ namespace l01_linear_regression_one_dimension
     {
         public static double calc(Model model, Data data)
         {
-            return data.y.Zip(data.x, (y, x) => Math.Pow(y - model.predict(x), 2)).Sum();
+            return data.rows.Select(r => Math.Pow(r.y - model.predict(r.x), 2)).Sum() / data.N;
+        }
+        public static double GradientA(Model model, Data data)
+        {
+            return data.rows.Select(r => -2 * r.x * (r.y - model.predict(r.x))).Sum() / data.N;
+        }
+        public static double GradientB(Model model, Data data)
+        {
+            return data.rows.Select(r => -2 * (r.y - model.predict(r.x))).Sum() / data.N;
         }
     }
 }
