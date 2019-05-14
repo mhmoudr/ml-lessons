@@ -1,3 +1,5 @@
+using System.IO;
+using System.Linq;
 using id3;
 using NUnit.Framework;
 
@@ -10,13 +12,19 @@ namespace Tests
         [SetUp]
         public void Setup()
         {
-            data = Repository.GetTrainStatusData();
+            var featuresNum = 3;
+            var lines = File.ReadLines("../../../../train.csv");
+            data = new Data()
+            {
+                Columns = lines.First().Split(",").Select((value, index) => (value, index)).Take(featuresNum).ToDictionary(i => i.value, i => i.index),
+                Rows = lines.Skip(1).Select(l => l.Split(",")).Select(r => (r[featuresNum], r.Take(featuresNum).ToArray())).ToArray()
+            };
         }
 
         [Test]
         public void EntropyCalculationIsCorrect()
         {
-            var e = Entropy.Calculate(data, "IsLate");
+            var e = Entropy.Calculate(data.Rows.Select(r=>r.lable).ToArray());
             Assert.That(e, Is.EqualTo(0.940).Within(0.001));
         }
         [Test]
