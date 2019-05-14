@@ -1,48 +1,61 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
 namespace id3
 {
-    public class Node
+ public abstract class Node
     {
-        public (string col, double gain) SplittingColumn { get; set; }
-        public Dictionary<string, Node> Children { get; set; }
-        public Data Data { get; private set; }
-        public Node(Data data)
+    }
+    public class Tree : SplitNode
+    {
+        public string Predict(Dictionary<string, int> columns, string[] factors)
         {
-            Data = data;
+            return Predict(columns, factors, this);
         }
-        internal void print()
+        private string Predict(Dictionary<string, int> columns, string[] factors, Node node)
         {
-            Console.WriteLine("Printing tree");
-            Console.WriteLine("==============");
-            print(0, this);
-        }
-        public String Prediction = null;
-        public bool IsLeaf { get { return Prediction != null; } }
-        bool HaveSplit { get { return (Children != null); } }
-        void print(int level, Node node)
-        {
-            printSpace(level);
-            if (!node.IsLeaf)
+            switch (node)
             {
-                Console.WriteLine($"Node level {level} split by {node.SplittingColumn.col} ({node.SplittingColumn.gain}) for the following values:");
-                level++;
-                foreach (var n in node.Children)
-                {
-                    printSpace(level);
-                    Console.WriteLine($"value {n.Key}:");
-                    print(level + 1, n.Value);
-                }
-            }
-            else
-            {
-                Console.WriteLine($"leaf node with value {node.Prediction}");
+                case LeafNode ln:
+                    return ln.Response;
+                case SplitNode sn:
+                    var splitIndex = columns[sn.SplittingColumn];
+                    var childNode = sn.Children[factors[splitIndex]];
+                    return Predict(columns, factors, childNode);
+                default:
+                    return null;
             }
         }
-        void printSpace(int level)
+        public void Print()
         {
-            for (var i = 0; i < level; i++)
-                Console.Write("  ");
+            Print(this,0);
         }
+        private void Print(Node node, int level)
+        {
+            var indent =String.Join("", Enumerable.Repeat("   ",level));
+            switch(node){
+                case LeafNode ln:
+                    Console.WriteLine($"{indent}Leaf Node with value: {ln.Response}");
+                    break;
+                case SplitNode sn:
+                    foreach(var n in sn.Children){
+                        Console.WriteLine($"{indent}When {sn.SplittingColumn} == {n.Key}, with gain of: {sn.Gain}");
+                        Print(n.Value,level+1);
+                    }
+                    break;
+
+            }
+        }
+    }
+    public class LeafNode : Node
+    {
+        public string Response;
+    }
+    public class SplitNode : Node
+    {
+        public double Gain;
+        public string SplittingColumn;
+        public Dictionary<string, Node> Children;
     }
 }
