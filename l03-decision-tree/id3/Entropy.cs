@@ -6,18 +6,13 @@ namespace id3
 {
     public static class Entropy
     {
-        public static double Calculate(Data data, string targetColumn)
+        public static double Calculate(string[] data)
         {
-            var idx = data.Columns[targetColumn];
-            return Calculate(data.Rows.Select(r=>r[idx]).ToArray());
-        }
-        public static double Calculate(string[] column)
-        {
-            return column
+            return data
                 .GroupBy(v => v)
                 .Select(g =>
                 {
-                    var p = (double) g.Count() / column.Length;
+                    var p = (double)g.Count() / data.Length;
                     return -p * Math.Log(p, 2);
                 })
                 .Sum();
