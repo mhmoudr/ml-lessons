@@ -1,0 +1,15 @@
+Day,Timing,Weather,Wind,Response
+1,AfterWeekend,Rain,Weak,Y
+2,AfterWeekend,Rain,Strong,Y
+3,MidWeek,Rain,Weak,N
+4,AfterPublicHoliday,Rain,Weak,N
+5,AfterPublicHoliday,Normal,Weak,N
+6,AfterPublicHoliday,Normal,Strong,Y
+7,MidWeek,Normal,Strong,N
+8,AfterWeekend,Rain,Weak,Y
+9,AfterWeekend,Normal,Weak,N
+10,AfterPublicHoliday,Normal,Weak,N
+11,AfterWeekend,Normal,Strong,N
+12,MidWeek,Rain,Strong,N
+13,MidWeek,Normal,Weak,N
+14,AfterPublicHoliday,Rain,Strong,Y
