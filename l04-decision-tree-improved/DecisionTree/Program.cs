@@ -8,7 +8,7 @@ namespace DecisionTree
     class Program
     {
        static void Main(string[] args)
-        {
+        {            
             var lines = File.ReadLines("../heart.csv");
             var data = new Data()
             {
