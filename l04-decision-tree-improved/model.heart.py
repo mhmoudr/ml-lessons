@@ -1,4 +1,3 @@
-
 import os
 import pandas as pd
 import numpy as np
@@ -48,8 +47,7 @@ l_train = lightgbm.Dataset(x_train, y_train)
 l_test = lightgbm.Dataset(x_test,y_test)
 
 l_params = {
-    'learning_rate': 0.01 , 
-    'application': 'binary',
+    'learning_rate': 0.005 , 
     'objective': 'binary',
     'metric': 'binary_logloss',
     'boosting': 'gbdt',
@@ -66,7 +64,12 @@ l_model = lightgbm.train(l_params,
                          feature_name=features)
 plt.rcParams['figure.figsize'] = [10, 7]
 lightgbm.plot_metric(l_progress)
+
+png = plt.gcf()
 lightgbm.plot_tree(l_model,tree_index=1,figsize=(60,60),show_info=['split_gain'])
+png.savefig(folder+"tree.png",dpi=100)
+plt.show()
+
 lightgbm.plot_importance(l_model)
 # building trees using XG_Boost
 import xgboost 
