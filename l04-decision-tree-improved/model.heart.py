@@ -1,7 +1,10 @@
+
 import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+
+
 #folder = "C:\\Users\\Mahmoud\\projects\\ml-lessons\\l04-decision-tree-improved\\"
 folder  = "/Users/mahmoudr/playground/ml-lessons/l04-decision-tree-improved/"
 data = pd.read_csv(folder + "heart.csv")
@@ -31,6 +34,7 @@ y_test = test.target.values
 # df.columns = d.feature_names
 # df.describe()
 
+
 # building tree using scikti learn 
 from sklearn import tree
 dtc = tree.DecisionTreeClassifier()
@@ -56,14 +60,14 @@ l_progress = dict()
 l_model = lightgbm.train(l_params,
                          l_train,
                          valid_sets=[l_train, l_test],
-                         num_boost_round=2000,
+                         num_boost_round=2000, 
                          evals_result=l_progress,
                          verbose_eval=10,
                          feature_name=features)
 plt.rcParams['figure.figsize'] = [10, 7]
 lightgbm.plot_metric(l_progress)
 lightgbm.plot_tree(l_model,tree_index=1,figsize=(60,60),show_info=['split_gain'])
-
+lightgbm.plot_importance(l_model)
 # building trees using XG_Boost
 import xgboost 
 
