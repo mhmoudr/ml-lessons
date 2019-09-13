@@ -40,20 +40,16 @@ namespace l01_linear_regression_one_dimension
         {
             var model = new Model() { a = 1, b = 1 };
             var iteration = 0;
-            //var stepSize = 0.01d;
-            var oldError = double.MaxValue;
+            var stepSize = .1;
             var error = MSE.calc(model, data);
-            var threshold = 0.0001;
-            while (iteration < maxNumerOfIterations && oldError - error > threshold || error > oldError)
+            while (iteration < maxNumerOfIterations)
             {
 
-                var Ga = MSE.GradientA(model,data);
-                var Gb = MSE.GradientB(model,data);
-                var stepSize = 1d / (2 + iteration);
+                var Ga = MSE.GradientA(model, data);
+                var Gb = MSE.GradientB(model, data);
                 Console.WriteLine($"{iteration}:\ta={model.a}\tb={model.b}\tGa={Ga}\tGb={Gb}\tE={error}\tStep={stepSize}");
                 model.a -= Ga * stepSize;
                 model.b -= Gb * stepSize;
-                oldError = error;
                 error = MSE.calc(model, data);
                 iteration++;
             }
@@ -62,17 +58,13 @@ namespace l01_linear_regression_one_dimension
     }
     class MSE
     {
-        public static double calc(Model model, Data data)
-        {
-            return data.rows.Select(r => Math.Pow(r.y - model.predict(r.x), 2)).Sum() / data.N;
-        }
-        public static double GradientA(Model model, Data data)
-        {
-            return data.rows.Select(r => -2 * r.x * (r.y - model.predict(r.x))).Sum() / data.N;
-        }
-        public static double GradientB(Model model, Data data)
-        {
-            return data.rows.Select(r => -2 * (r.y - model.predict(r.x))).Sum() / data.N;
-        }
+        public static double calc(Model model, Data data) =>
+            data.rows.Select(r => Math.Pow(r.y - model.predict(r.x), 2)).Sum() / data.N;
+
+        public static double GradientA(Model model, Data data) =>
+            data.rows.Select(r => -2 * r.x * (r.y - model.predict(r.x))).Sum() / data.N;
+
+        public static double GradientB(Model model, Data data) =>
+            data.rows.Select(r => -2 * (r.y - model.predict(r.x))).Sum() / data.N;
     }
 }

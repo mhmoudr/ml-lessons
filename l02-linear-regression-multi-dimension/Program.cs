@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace l01_linear_regression_multi_dimension
@@ -71,10 +70,9 @@ namespace l01_linear_regression_multi_dimension
             var oldError = double.MaxValue;
             var error = MSE.Calc(model, data);
             var threshold = 0.0001;
-            while (iteration < maxNumerOfIterations && oldError - error > threshold || error > oldError)
+            while (iteration < maxNumerOfIterations)
             {
                 var gradients = MSE.Gradients(model, data);
-                //var stepSize = 1d / (2 + iteration);
                 for (int i = 0; i < model.b.Length; i++)
                     model.b[i] -= gradients[i] * stepSize;
                 Console.WriteLine($"iteration {iteration}, error {error}");
@@ -90,26 +88,19 @@ namespace l01_linear_regression_multi_dimension
 
     class MSE
     {
-        public static double Calc(Model model, Data data)
-        {
-            return data.Rows.Select(i => Math.Pow(i.y - model.Predict(i.x), 2)).Sum() / data.Rows.Length;
-        }
+        public static double Calc(Model model, Data data) => 
+            data.Rows.Select(i => Math.Pow(i.y - model.Predict(i.x), 2)).Sum() / data.Rows.Length;
+        
+        private static double GradientBeta_0(Model model, Data data) =>
+            data.Rows.Select(i => i.y - model.Predict(i.x)).Sum() * (-2) / data.Rows.Length;
 
-        private static double GradientBeta_0(Model model, Data data)
-        {
-            return data.Rows.Select(i => i.y - model.Predict(i.x)).Sum() * (-2) / data.Rows.Length;
-        }
+        private static double GradientBeta_k(Model model, Data data, int k) =>
+            data.Rows.Select(i => (i.y - model.Predict(i.x)) * i.x[k]).Sum() * (-2) / data.Rows.Length;
 
-        private static double GradientBeta_k(Model model, Data data, int k)
-        {
-            return data.Rows.Select(i => (i.y - model.Predict(i.x)) * i.x[k]).Sum() * (-2) / data.Rows.Length;
-        }
-
-        public static double[] Gradients(Model model, Data data)
-        {
-            return Enumerable.Range(0, data.NumberOfFeatures)
+        public static double[] Gradients(Model model, Data data) =>
+            Enumerable.Range(0, data.NumberOfFeatures)
                     .Select(k => GradientBeta_k(model, data, k))
                     .Concat(new[] { GradientBeta_0(model, data) }).ToArray();
-        }
+        
     }
 }
