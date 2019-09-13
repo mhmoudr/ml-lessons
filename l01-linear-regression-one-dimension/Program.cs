@@ -9,16 +9,18 @@ namespace l01_linear_regression_one_dimension
             var data = new Data()
             {
                 rows = new (double, double)[]{
-                (0.8,1),
-                (1,2),
-                (2,3),
-                (2.2,4),
-                (2.3,5)
-            }
+                    (499000,1),
+                    (550000,2),
+                    (678000,3),
+                    (415000,1),
+                    (399000,1),
+                    (800000,3),
+                    (720000,3)
+                }
             };
             var model = LinearRegression.train(data, 1000);
 
-            Console.WriteLine($"priave for 6 bed rooms is {model.predict(6)}");
+            Console.WriteLine($"price for 4 bed rooms is {model.predict(4)}");
         }
     }
     class Model
