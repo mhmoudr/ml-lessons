@@ -4,15 +4,15 @@ import scala.annotation.tailrec
 import scala.io.Source
 
 object Application extends App {
-  private val filename = "/home/mahmoud/projects/ml-lessons/l03-decision-tree/train.csv"
+  private val filename = "/Users/mrawas01/playground/ml-lessons/l03-decision-tree/train.csv"
   private val file = Source.fromFile(filename)
-  val lines = file.getLines.toList
+  private val lines = file.getLines.toList
   file.close()
-  val data = Data(
+  private val data = Data(
     lines.head.split(",").zipWithIndex.init.toMap ,
     lines.tail.map(_.split(",")).map(row=>Row(row.last,row.init.toList))
   )
-  val model = ID3.train(data,10)
+  private val model = ID3.train(data,10)
   println(s"testing $model")
 }
 
@@ -43,7 +43,7 @@ object ID3 {
     Tree(res.gain,res.splittingColumn,res.children)
   }
   private def bestSplit (data:Data) : ( String, Double) =
-    data.columns.map(col => (col._1, InformationGain.calc(data, col._1))).toList.maxBy(_._2)
+    data.columns.keys.map(col => (col, InformationGain.calc(data, col))).toList.maxBy{case (_,gain) => gain}
 }
 
 trait Node
@@ -83,9 +83,11 @@ object InformationGain{
     val colIdx = data.columns(column)
     InformationGain.calc(data.rows.map(r=>(r.label,r.factos(colIdx))))
   }
-  private def calc (data:List[(String,String)]):Double =
+  private def calc (data:List[(String,String)]):Double = {
+    Entropy.calc(data.map{case (label,response) => label}) -
     data
-      .groupBy{case (_,factor) => factor}
-      .map(g=>(g._2.length.toDouble/data.length) * Entropy.calc(g._2.map(_._1)))
+      .groupBy{case (label,factor) => factor}
+      .map{case key -> group =>(group.length.toDouble/data.length) * Entropy.calc(group.map{case (label,factor) => label})}
       .sum
+  }
 }
