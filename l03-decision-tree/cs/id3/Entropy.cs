@@ -13,7 +13,7 @@ namespace id3
                 .Select(g =>
                 {
                     var p = (double)g.Count() / data.Length;
-                    return -p * Math.Log(p, 2);
+                    return -p * math.Log(p);
                 })
                 .Sum();
         }
