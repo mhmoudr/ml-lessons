@@ -4,9 +4,9 @@ import scala.annotation.tailrec
 import scala.io.Source
 
 object Application extends App {
-  private val filename = "/Users/mrawas01/playground/ml-lessons/l03-decision-tree/train.csv"
+  private val filename = "../../train.csv"
   private val file = Source.fromFile(filename)
-  private val lines = file.getLines.toList
+  private val lines = file.getLines().toList
   file.close()
   private val data = Data(
     lines.head.split(",").zipWithIndex.init.toMap ,
