@@ -39,10 +39,10 @@ impl MSE{
         data.iter().map(|d| (d.y - model.predict(&d.x)).powi(2) ).sum::<Float>() / (data.len() as Float)
     }
     fn gradient_b(data:&Data, model:&Model , i:usize) -> Float {
-        data.iter().map(|d| d.x[i] * (d.y - model.predict(&d.x))).sum::<Float>() / (-2. * data.len() as Float)
+        data.iter().map(|d| d.x[i] * (d.y - model.predict(&d.x))).sum::<Float>() * (-2. / data.len() as Float)
     }
     fn gradient_b0(data:&Data, model:&Model) -> Float {
-        data.iter().map(|d| d.y - model.predict(&d.x)).sum::<Float>() / (-2. * data.len() as Float)
+        data.iter().map(|d| d.y - model.predict(&d.x)).sum::<Float>() * (-2. / data.len() as Float)
     }
     fn gradients(data:&Data, model:&Model) -> Vec<Float> {
         (0 .. data[0].x.len()).map(|idx| MSE::gradient_b(data,model,idx)).chain(vec!(MSE::gradient_b0(data,model))).collect()
